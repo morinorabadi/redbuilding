@@ -1,0 +1,22 @@
+---- boos sign up ----
+{
+    "username" : "mori",
+    "password" : "1234",
+    "firsname" : "mori",
+    "phone"    : "09909069085",
+    "lastname" : "nori",
+    "email"    : "mori.nori@gmail.com"
+}
+
+---- login ----
+{
+    "username" : "mori",
+    "password" : "1234",
+    "is_boss" : false
+}
+or
+{
+    "username" : "mori",
+    "password" : "1234",
+    "is_boss" : false
+}

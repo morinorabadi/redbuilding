@@ -128,6 +128,3 @@ def is_authenticated(request, with_user=False):
         return models.BossUser.objects.get(pk=moritoken.user_id)
     else:
         return models.WorkerUser.objects.get(pk=moritoken.user_id)
-
-
-commit_mas = "create custom authenticatio app called 'user'"

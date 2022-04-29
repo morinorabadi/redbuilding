@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>login</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Lalezar&display=swap");
+      * {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+        font-family: Lalezar, cursive;
+        color: white;
+      }
+      html {
+        font-size: 16px;
+      }
+      body {
+        background-color: #2f2f2f;
+        height: 100vh;
+        padding: calc(50vh - 225px) 0;
+      }
+      div {
+        width: 350px;
+        height: 450px;
+        margin: 0 auto;
+        background-color: rgb(21, 21, 21);
+        padding: 20px 0;
+        border-radius: 50px;
+        box-shadow: 0 0 20px 2px rgba(0, 0, 0, 0.5);
+      }
+      h1 {
+        font-size: 2.2rem;
+        text-align: center;
+      }
+      span {
+        color: rgb(180, 0, 0);
+        font-size: 2.4rem;
+      }
+      p {
+        display: block;
+        width: 80%;
+        height: 40px;
+        margin: 5px auto;
+        text-align: center;
+        font-size: 1.2rem;
+      }
+      input {
+        background-color: rgb(21, 21, 21);
+        display: block;
+        width: 80%;
+        height: 50px;
+        margin: 20px auto;
+        padding: 0 10px;
+        font-size: 1.4rem;
+        border: 0;
+        border-bottom: 2px solid rgb(255, 255, 255);
+        outline: none;
+      }
+      input:focus {
+        background-color: rgb(35, 35, 35);
+      }
+      button {
+        display: block;
+        width: 60%;
+        height: 55px;
+        margin: 0 auto;
+        margin-top: 30px;
+        background-color: rgb(255, 72, 72);
+        font-size: 1.8rem;
+        color: white;
+        border-radius: 20px;
+        border: none;
+        box-shadow: 0px 0px 5px 1px rgba(69, 31, 194, 0.2);
+      }
+      button:hover {
+        background-color: rgb(105, 22, 22);
+      }
+      a {
+        color: rgb(168, 23, 23);
+        display: block;
+        margin: 0 auto;
+        margin-top: 10px;
+        text-align: center;
+        font-size: 1.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login">
+      <h1>
+        wellcome to&nbsp;&nbsp;&nbsp;&nbsp;<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;<span>Red</span> buiding
+      </h1>
+      <p></p>
+      <input type="text" placeholder="username" id="username" />
+      <input type="password" placeholder="password" id="password" />
+      <button>login</button>
+      <a href="#">create new acount</a>
+    </div>
+  </body>
+  <script>
+    // get necessarily object
+    let usernameTag = document.getElementById("username");
+    let passwordTag = document.getElementById("password");
+    let msg = document.getElementsByTagName("p")[0];
+
+    // set EventListener for login button
+    document.querySelector("button").addEventListener("click", login);
+
+    // login function
+    async function login() {
+      // check is username and password are not empty
+      if (usernameTag.value === "" || passwordTag.value === "") {
+        msg.innerText = "plz fill password and username";
+        msg.style.color = "red";
+        setTimeout(() => {
+          msg.innerText = "";
+        }, 3000);
+        return;
+      }
+      //send a request to server
+
+      // is not complated need some change
+      try {
+        const response = await fetch("http://127.0.0.1:8000/api/user/login/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: usernameTag.value,
+            password: passwordTag.value,
+          }),
+        });
+        console.log(await response.json());
+      } catch (error) {
+        alert(error);
+      }
+    }
+  </script>
+</html>

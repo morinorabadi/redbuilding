@@ -19,12 +19,12 @@
       }
       body {
         background-color: #2f2f2f;
-        height: 100vh;
-        padding: calc(50vh - 225px) 0;
+        min-height: 100vh;
+        padding: calc(50vh - 365px) 0;
       }
       div {
         width: 350px;
-        height: 450px;
+        height: 730px;
         margin: 0 auto;
         background-color: rgb(21, 21, 21);
         padding: 20px 0;
@@ -52,7 +52,7 @@
         display: block;
         width: 80%;
         height: 50px;
-        margin: 20px auto;
+        margin: 10px auto;
         padding: 0 10px;
         font-size: 1.4rem;
         border: 0;
@@ -96,44 +96,62 @@
       </h1>
       <p></p>
       <input type="text" placeholder="username" id="username" />
+      <input type="text" placeholder="first name" id="first_name" />
+      <input type="text" placeholder="last name" id="last_name" />
+      <input type="text" placeholder="phone" id="phone" />
+      <input type="text" placeholder="email" id="email" />
       <input type="password" placeholder="password" id="password" />
-      <button>login</button>
-      <a href="#">create new acount</a>
+      <input type="password" placeholder="confirm password" id="password1" />
+      <button>sign up</button>
+      <a href="#">already have account login</a>
     </div>
   </body>
   <script>
     // get necessarily object
-    let usernameTag = document.getElementById("username");
-    let passwordTag = document.getElementById("password");
+    let inputs = document.querySelectorAll("input");
     let msg = document.getElementsByTagName("p")[0];
-
+    console.log(inputs);
     // set EventListener for login button
     document.querySelector("button").addEventListener("click", login);
 
     // login function
     async function login() {
-      // check is username and password are not empty
-      if (usernameTag.value === "" || passwordTag.value === "") {
-        msg.innerText = "plz fill password and username";
-        msg.style.color = "red";
-        setTimeout(() => {
-          msg.innerText = "";
-        }, 3000);
+      // check if username , first name  are not empty
+      if (
+        inputs[0].value === "" ||
+        inputs[1].value === "" ||
+        inputs[3].value === "" ||
+        inputs[5].value === "" ||
+        inputs[6].value === ""
+      ) {
+        showMsg("plz fill necessary field");
+        return;
+      }
+
+      // chech if password are match
+      if (inputs[5].value === inputs[6].value) {
+        showMsg("passwords are not match");
         return;
       }
 
       //send a request to server
+
+      // is not complated need some change
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/user/login/", {
+        const response = await fetch("http://127.0.0.1:8000/api/user/singup/", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            username: usernameTag.value,
-            password: passwordTag.value,
+            username: inputs[0].value,
+            firsname: inputs[1].value,
+            lastname: inputs[2].value,
+            phone: inputs[3].value,
+            email: inputs[4].value,
+            password: inputs[5].value,
           }),
         });
         if (response.ok) {
-          // send user to app page
+          // send user to login page
           window.location.href = "#";
         } else {
           const data = await response.json();
@@ -142,6 +160,13 @@
       } catch (error) {
         alert(error);
       }
+    }
+    function showMsg(msg) {
+      msg.innerText = msg;
+      msg.style.color = "red";
+      setTimeout(() => {
+        msg.innerText = "";
+      }, 3000);
     }
   </script>
 </html>

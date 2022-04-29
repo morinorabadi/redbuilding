@@ -12,11 +12,9 @@
 {
     "username" : "mori",
     "password" : "1234",
-    "is_boss" : false
 }
 or
 {
     "username" : "mori",
     "password" : "1234",
-    "is_boss" : false
 }

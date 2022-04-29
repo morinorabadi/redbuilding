@@ -10,57 +10,34 @@ from . import models, serializers
 chares = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 
-# for create new boss model
+# for create new user model
 @api_view(("POST",))
-def boss_signup(request):
-    instance = serializers.BossUserSignUp(data=request.data)
+def signup(request):
+    instance = serializers.UserSignUp(data=request.data)
     if instance.is_valid(True):
         instance.save()
         return Response(instance.data, status=status.HTTP_200_OK)
 
 
-# this api design for create worker models
-# sine worker model have boss field
-# only boss can make worker so we need to authenticate boss
-@api_view(("POST",))
-def worker_signup(request):
-    boss = is_authenticated()
-    if type(boss) is not models.BossUser:
-        return boss
-    data = request.data
-    data["boss"] = boss.id
-    instance = serializers.WorkerUserSignUp(data=data)
-    if instance.is_valid(True):
-        instance.save()
-        return Response(instance.data, status=status.HTTP_200_OK)
-
-
-# this can be used for Boss and Worker login
+# this can be used for User login
 @api_view(("POST",))
 def login(request):
     # serialaz passed data
     try:
-        username, password, is_boss = request.data["username"], request.data["password"], request.data["is_boss"]
+        username, password = request.data["username"], request.data["password"]
     except KeyError:
         return Response({"msg": "fill necesery field"}, status=status.HTTP_400_BAD_REQUEST)
 
     # find User instance and authenticated
     try:
-        if is_boss == True:
-            instance = models.BossUser.objects.get(username=username)
-        else:
-            instance = models.WorkerUser.objects.get(username=username)
-
+        instance = models.User.objects.get(username=username)
         if not instance.password == password:
             raise ValueError
-    except (models.BossUser.DoesNotExist, models.WorkerUser.DoesNotExist, ValueError) as error:
+    except (models.User.DoesNotExist, ValueError) as error:
         return Response({'msg': 'username and password is not match'}, status=status.HTTP_401_UNAUTHORIZED)
 
     # if request reach here every thing is fine and return response with cookies
-    if is_boss == True:
-        data = serializers.BossUserSignUp(instance).data
-    else:
-        data = serializers.WorkerUserSignUp(instance).data
+    data = serializers.UserSignUp(instance)
 
     response = Response(data, status=status.HTTP_202_ACCEPTED)
     response.set_cookie('moritoken', new_mori_token(instance))
@@ -73,15 +50,14 @@ def login(request):
 def is_authenticated_api(request):
     user = is_authenticated(request)
     if type(user) is Response:
-        return Response({"msg": "ok"}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response({"msg": "plz authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
     return Response({"msg": "ok"}, status=status.HTTP_200_OK)
 
 
-def new_mori_token(user_id, is_boss):
+def new_mori_token(user):
     # find and delete old token if exsit
     try:
-        exist_token = models.MoriToken.objects.get(
-            user_id=user_id, is_boss=is_boss)
+        exist_token = models.MoriToken.objects.get(user=user)
         exist_token.delete()
     except models.MoriToken.DoesNotExist:
         pass
@@ -92,16 +68,15 @@ def new_mori_token(user_id, is_boss):
         token += random.choice(chares)
 
     # create new mori_token and return token
-    models.MoriToken.objects.create(
-        token=token, user_id=user_id, is_boss=False)
+    models.MoriToken.objects.create(token=token, user=user)
     return token
 
 
 # this method use in backend when we want response data related to a user
-def is_authenticated(request, with_user=False):
+def is_authenticated(request):
     time_now = datetime.datetime.now()
 
-    # get old cookie
+    # get cookie
     try:
         token = request.COOKIES["moritoken"]
     except KeyError:
@@ -118,13 +93,7 @@ def is_authenticated(request, with_user=False):
         moritoken.delete()
         return Response({"error": "is been to long from last request login again"}, status=status.HTTP_401_UNAUTHORIZED)
 
-    # if request rach here every thing is all right
+    # if request rach here everything is all right
     moritoken.created = time_now
     moritoken.save()
-    if with_user == False:
-        return True
-    # try to return user if with_user is True
-    if moritoken.is_boss == True:
-        return models.BossUser.objects.get(pk=moritoken.user_id)
-    else:
-        return models.WorkerUser.objects.get(pk=moritoken.user_id)
+    return moritoken.user

@@ -8,14 +8,7 @@ class UserLogin(serializers.Serializer):
     is_boss = serializers.BooleanField(default=True)
 
 
-class BossUserSignUp(serializers.ModelSerializer):
+class UserSignUp(serializers.ModelSerializer):
     class Meta:
-        model = models.BossUser
+        model = models.User
         fields = '__all__'
-
-
-class WorkerUserSignUp(serializers.ModelSerializer):
-    class Meta:
-        model = models.WorkerUser
-        fields = '__all__'
-
